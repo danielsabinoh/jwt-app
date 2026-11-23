@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Biblioteca JWT — interface
 
-## Getting Started
+Interface React com Next.js App Router. A página inicial faz o login e `/dashboard` reúne as seções protegidas do sistema. O atendente começa pela consulta ao acervo. O administrador vê o painel de totais e as opções de gestão.
 
-First, run the development server:
+## Instalação
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Inicie o projeto `jwt-api` primeiro. Em outro PowerShell, abra a pasta deste projeto e rode:
+
+```powershell
+npm.cmd ci
+Copy-Item .envex .env.local
+npm.cmd run dev -- --port 3001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3001 e entre com o e-mail e a senha do administrador configurados no .env da API. Para trocar a URL da API, edite `NEXT_PUBLIC_API_URL` no .env.local e reinicie o front-end. O valor padrão é http://localhost:3000/v1. Se mudar a porta do front-end, ajuste também `FRONTEND_URL` na API e reinicie os dois projetos.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+npm.cmd run lint
+npm.cmd run build
+npm.cmd start -- --port 3001
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use o último comando depois de compilar e encerrar o servidor de desenvolvimento, para rodar a versão de produção local.
 
-## Learn More
+## Sessão e componentes
 
-To learn more about Next.js, take a look at the following resources:
+- Componentes funcionais, props e hooks organizam as telas, os formulários e as tabelas. A camada de API está em `lib/api.js`.
+- A interface guarda access e refresh token no `sessionStorage`. Eles ficam disponíveis ao recarregar a aba e são removidos no logout. JavaScript daquela origem pode ler o storage, portanto uma falha de XSS pode expor os tokens. Essa escolha segue o fluxo obrigatório com refresh no corpo e permite observar as chamadas no navegador.
+- A tela protegida confirma a sessão em `/auth/me` antes de mostrar as seções. Quando a API responde 401, o cliente compartilha uma única promessa de renovação entre chamadas pendentes. Cada chamada repete o pedido uma vez com o novo token. Se o refresh falhar com 401, o cliente limpa a sessão e volta ao login.
+- Ocultar menus de administração melhora a navegação. A API verifica o perfil nas rotas protegidas e retorna 403 para o atendente.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[Repositório-base da interface](https://github.com/ADS-Unipar/jwt-app)
